@@ -1,59 +1,71 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SimpleVue Authentication App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This project is a simple web application built with **PHP Laravel** and **Vue.js**, implementing a basic login and registration system with form validation and error handling.
 
-## About Laravel
+## Stack
+- **Backend:** PHP Laravel 11
+- **Frontend:** Vue.js 3 (Composition API / Options API), Tailwind CSS
+- **Authentication:** Token-based (Sanctum-ready architecture)
+- **Database:** SQLite (default for Laravel) or MySQL
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Project Structure & Decisions
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Backend (`app/Http/Controllers/AuthController.php`)
+I created a dedicated `AuthController` to handle authentication logic instead of using starter kits like Breeze/Jetstream effectively demonstrating the underlying logic:
+- **`register`**: Validates user input (`required`, `email`, `unique`, `confirmed`) and creates a new user. Returns an access token.
+- **`login`**: Validates credentials and returns an access token if successful.
+- **Validation**: Uses Laravel's built-in `Validator` facade to ensure data integrity. Validation errors are returned as JSON with a 422 status code.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### API Routes (`routes/api.php`)
+- `POST /register`: Endpoint for user registration.
+- `POST /login`: Endpoint for user login.
+- `GET /user`: Secured endpoint (requires valid token) to fetch user details.
 
-## Learning Laravel
+### Frontend (`resources/js/`)
+The frontend is a Single Page Application (SPA) feel embedded within Laravel's Blade views.
+- **`resources/js/app.js`**: Main entry point, setting up Vue Router.
+- **`resources/js/router.js`**: Defines routes for Login, Register, and Welcome pages.
+- **`resources/js/components/`**:
+    - **`Register.vue`**: Handles user registration. Checks password confirmation on client-side before sending. Captures backend validation errors (e.g., "Email already taken") and displays them inline.
+    - **`Login.vue`**: Handles user login. Stores the received JWT/Access Token in `localStorage` for ensuring authenticated state across the session.
+    - **`Welcome.vue`**: Landing page.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Styling
+- **Tailwind CSS**: Used for rapid, responsive, and clean UI development. The design is kept minimal and professional ("SimpleVue" branding).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Setup Instructions
 
-## Laravel Sponsors
+1.  **Install Dependencies**
+    ```bash
+    composer install
+    npm install
+    ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2.  **Environment Setup**
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-### Premium Partners
+3.  **Database Migration**
+    ```bash
+    touch database/database.sqlite
+    php artisan migrate
+    ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+4.  **Run Development Servers**
+    ```bash
+    # Terminal 1 (Backend)
+    php artisan serve
 
-## Contributing
+    # Terminal 2 (Frontend)
+    npm run dev
+    ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Decisions Rationale
+- **Manual Auth Implementation**: To satisfy the requirement of "proper validation and binding" and demonstrating understanding of the auth flow rather than relying on auto-generated scaffolds.
+- **Axios**: Standard for HTTP requests in Vue/Laravel ecosystem.
+- **Token Storage**: Simple `localStorage` implementation for the test task scope. For production, `httpOnly` cookies via Sanctum would be preferred for better security against XSS.
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+**Author**: Ran Bahadur Kc
